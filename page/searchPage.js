@@ -1,10 +1,8 @@
 import React, { Component, useState, useEffect } from 'react';
-import {
-    StyleSheet, Text, View,
-    TouchableOpacity, Image, TextInput, Modal, Dimensions, ScrollView
-} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput, Modal, Dimensions, ScrollView } from 'react-native';
 import axios from 'axios';
 import { CheckBox } from 'react-native-elements'
+import { convertRupiah, convertDate } from '../page/components/converFunction'
 
 const ScreenHeight = Dimensions.get("window").height
 const ScreenWidth = Dimensions.get("window").width
@@ -13,13 +11,6 @@ function Home({ navigation }) {
     const [dataList, setDataList] = useState({})
     const [dataListDefault, setDataListDefault] = useState({})
     const [modalVisible, setModalVisible] = useState(false);
-    const [dataSortDefault, setdataSortDefault] = useState([
-        { id: 1, title: 'Name A-Z', checked: false },
-        { id: 2, title: 'Nama Z-A', checked: false },
-        { id: 3, title: 'Tanggal Terbaru', checked: false },
-        { id: 4, title: 'Tanggal Terlama', checked: false }
-
-    ])
     const [dataSort, setDataSort] = useState([
         { id: 1, title: 'Name A-Z', checked: false },
         { id: 2, title: 'Nama Z-A', checked: false },
@@ -64,13 +55,6 @@ function Home({ navigation }) {
         })
     }
 
-    function convertRupiah(value) {
-        let reverse = value.toString().split('').reverse().join('')
-        let result1 = reverse.match(/\d{1,3}/g)
-        let result = result1.join('.').split('').reverse().join('')
-        return result
-    }
-
     function navigate(data) {
         navigation.navigate('Detail', { data })
     }
@@ -102,14 +86,6 @@ function Home({ navigation }) {
             setDataList(newData)
         }
         setModalVisible(false)
-        setDataSort(dataSortDefault)
-    }
-
-    function toggleCheckbox(i) {
-        const checkboxData = [...dataSort];
-        checkboxData[i].checked = !checkboxData[i].checked;
-        setDataSort(checkboxData);
-        sortBy(i)
     }
 
     return (
@@ -131,11 +107,12 @@ function Home({ navigation }) {
                         const senderBank = dataList[key].sender_bank.toUpperCase()
                         const beneficiaryBank = dataList[key].beneficiary_bank.toUpperCase()
                         const status = dataList[key].status === 'SUCCESS' ? 'Berhasil' : 'Pengecekan'
+                        const minus = status === 'Berhasil' ? '' : '- '
                         const backgroundColor = status === "Berhasil" ? 'green' : 'red'
                         const borderColor = status === "Berhasil" ? 'white' : 'red'
                         const beneficiaryName = dataList[key].beneficiary_name
                         const amount = dataList[key].amount
-                        const createdAt = dataList[key].created_at.substring(0, 10)
+                        const createdAt = convertDate(dataList[key].created_at.substring(0, 10))
 
                         return (
                             <TouchableOpacity key={key} style={[styles.listDataContainer, { backgroundColor: backgroundColor }]} onPress={() => navigate(dataList[key])}>
@@ -145,7 +122,7 @@ function Home({ navigation }) {
                                     </Text>
                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                                         <Text style={{ fontSize: 15, top: 9 }}>
-                                            {beneficiaryName}
+                                            {`${minus}${beneficiaryName}`}
                                         </Text>
                                         <View style={[styles.status, { borderColor: borderColor, backgroundColor: backgroundColor === 'green' ? backgroundColor : 'white' }]}>
                                             <Text style={{ fontSize: 15, fontWeight: 'bold', color: status === 'Berhasil' ? 'white' : 'black' }}>
@@ -179,7 +156,7 @@ function Home({ navigation }) {
                                     checkedIcon='dot-circle-o'
                                     uncheckedIcon='circle-o'
                                     checked={item.checked}
-                                    onPress={() => toggleCheckbox(i)}
+                                    onPress={() => sortBy(i)}
                                     containerStyle={styles.checkBox}
                                     size={18}
                                     textStyle={{ fontSize: 18 }}
