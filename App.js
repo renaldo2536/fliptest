@@ -1,9 +1,17 @@
-import 'react-native-gesture-handler';
-import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React from 'react';
+import { View, Text } from 'react-native';
+import { createAppContainer } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation-stack';
+import searchPage from './page/searchPage'
+import detailTrans from './page/detailTrans'
 
-export default function App() {
-  return (
-    <NavigationContainer>{/* Rest of your app code */}</NavigationContainer>
-  );
-}
+const AppNavigator = createStackNavigator({
+  SearchPage: {
+    screen: searchPage,
+  },
+  Detail:{
+    screen: detailTrans
+  }
+});
+
+export default createAppContainer(AppNavigator);
